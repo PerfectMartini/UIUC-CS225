@@ -157,5 +157,22 @@ void BTree<K, V>::insert(BTreeNode* subroot, const DataPair& pair)
      */
 
     /* TODO Your code goes here! */
+    if (subroot->is_leaf)
+    {
+        size_t first_larger_idx = insertion_idx(subroot->elements, pair.key);
+        if (first_larger_idx >= subroot->elements.size() || subroot->elements[first_larger_idx].key != pair.key)
+        {
+            subroot->elements.insert(subroot->elements.begin() + first_larger_idx, pair);
+        }
+    }
+    else
+    {
+        size_t first_larger_idx = insertion_idx(subroot->elements, pair.key);
+        insert(subroot->children[first_larger_idx], pair);
+        if (subroot->children[first_larger_idx]->elements.size() >= order)
+        {
+            split_child(subroot, first_larger_idx);
+        }
+    }
 }
 
