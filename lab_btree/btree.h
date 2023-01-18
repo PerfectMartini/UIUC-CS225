@@ -364,7 +364,7 @@ size_t insertion_idx(const std::vector< T >& elements, const C& val)
 {
     /* TODO Your code goes here! */
     for (size_t i = 0; i < elements.size(); i++) {
-        if (elements[i] >= val) {
+        if (elements[i].key >= val) {
             return i;
         }
     }
