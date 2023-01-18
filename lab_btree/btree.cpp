@@ -57,28 +57,6 @@ V BTree<K, V>::find(const BTreeNode* subroot, const K& key) const
     return find(subroot->children[first_larger_idx], key);
 
 }
-template <class K, class V>
-V BTree<K,V>::find(const BTreeNode* subroot, const K& key) const
-{
-    size_t first_larger_idx = 0;
-    while(first_larger_idx < subroot->elements.size() && subroot->elements[first_larger_idx].key < key)
-    {
-        first_larger_idx++;
-    }
-    if(first_larger_idx < subroot->elements.size() && subroot->elements[first_larger_idx].key == key)
-    {
-        return subroot->elements[first_larger_idx].value;
-    }
-    else if(subroot->is_leaf)
-    {
-        return V();
-    }
-    else
-    {
-        return find(subroot->children[first_larger_idx], key);
-    }
-}
-
 
 /**
  * Inserts a key and value into the BTree. If the key is already in the
@@ -116,14 +94,13 @@ void BTree<K, V>::insert(const K& key, const V& value)
 template <class K, class V>
 void BTree<K, V>::split_child(BTreeNode* parent, size_t child_idx)
 {
-
     /* TODO Your code goes here! */
 
     /* Assume we are splitting the 3 6 8 child.
      * We want the following to happen.
      *     | 2 | 
      *    /     \
-     * | 1 |   | 3 | 6 | 8 |
+     * | 1 |   | 3 | 0.00 | 8 |
      *
      *
      * Insert a pointer into parent's children which will point to the 
@@ -147,6 +124,17 @@ void BTree<K, V>::split_child(BTreeNode* parent, size_t child_idx)
      * | 1 | | 3 | | 8 |
      *
      */
+    
+    size_t median_idx = (parent->children[child_idx]->elements.size() + 1) / 2;
+    DataPair median = parent->children[child_idx]->elements[median_idx];
+    parent->elements.insert(parent->elements.begin() + child_idx, median);
+    BTreeNode* right_node = new BTreeNode(parent->children[child_idx]->is_leaf, order);    
+    for(size_t i = median_idx + 1; i < parent->children[child_idx]->elements.size(); i++)
+    {
+        right_node->elements.push_back(parent->children[child_idx]->elements[i]);
+    }
+    parent->children.insert(parent->children.begin() + child_idx + 1, right_node);
+    parent->children[child_idx]->elements.erase(parent->children[child_idx]->elements.begin() + median_idx, parent->children[child_idx]->elements.end());
 }
 
 /**
