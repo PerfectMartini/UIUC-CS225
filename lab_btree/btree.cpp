@@ -35,7 +35,7 @@ V BTree<K, V>::find(const BTreeNode* subroot, const K& key) const
     /* If first_larger_idx is a valid index and the key there is the key we
      * are looking for, we are done. */
     size_t first_larger_idx = insertion_idx(subroot->elements, key);
-    if (subroot->elements[first_larger_idx].key == key)
+    if (first_larger_idx < elements.size() && subroot->elements[first_larger_idx].key == key)
     {
         return subroot->elements[first_larger_idx].value;
     }
@@ -127,10 +127,13 @@ void BTree<K, V>::split_child(BTreeNode* parent, size_t child_idx)
     
     size_t median_idx = order / 2;
     DataPair median = parent->children[child_idx]->elements[median_idx];
+
     parent->elements.insert(parent->elements.begin() + child_idx, median);
+    
     BTreeNode* right_node = new BTreeNode(parent->children[child_idx]->is_leaf, order);    
     right_node->elements.insert(right_node->elements.begin(), parent->children[child_idx]->elements.begin() + median_idx + 1, parent->children[child_idx]->elements.end());
     parent->children.insert(parent->children.begin() + child_idx + 1, right_node);
+    
     parent->children[child_idx]->elements.erase(parent->children[child_idx]->elements.begin() + median_idx, parent->children[child_idx]->elements.end());
 
     if(!parent->children[child_idx]->is_leaf)
@@ -162,7 +165,7 @@ void BTree<K, V>::insert(BTreeNode* subroot, const DataPair& pair)
     /* TODO Your code goes here! */
     size_t first_larger_idx = insertion_idx(subroot->elements, pair.key);
     if (subroot->is_leaf)
-    {
+{
         subroot->elements.insert(subroot->elements.begin() + first_larger_idx, pair);
     }
     else
