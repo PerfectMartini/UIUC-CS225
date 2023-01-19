@@ -130,19 +130,13 @@ void BTree<K, V>::split_child(BTreeNode* parent, size_t child_idx)
     DataPair median = parent->children[child_idx]->elements[median_idx];
     parent->elements.insert(parent->elements.begin() + child_idx, median);
     BTreeNode* right_node = new BTreeNode(parent->children[child_idx]->is_leaf, order);    
-    for(size_t i = median_idx + 1; i < parent->children[child_idx]->elements.size(); i++)
-    {
-        right_node->elements.push_back(parent->children[child_idx]->elements[i]);
-    }
+    right_node->elements.insert(right_node->elements.begin(), parent->children[child_idx]->elements.begin() + median_idx + 1, parent->children[child_idx]->elements.end());
     parent->children.insert(parent->children.begin() + child_idx + 1, right_node);
     parent->children[child_idx]->elements.erase(parent->children[child_idx]->elements.begin() + median_idx, parent->children[child_idx]->elements.end());
 
     if(!parent->children[child_idx]->is_leaf)
     {
-        for(size_t i = median_idx + 1; i < parent->children[child_idx]->children.size(); i++)
-        {
-            right_node->children.push_back(parent->children[child_idx]->children[i]);
-        }
+        right_node->children.insert(right_node->children.begin(), parent->children[child_idx]->children.begin() + median_idx + 1, parent->children[child_idx]->children.end());
         parent->children[child_idx]->children.erase(parent->children[child_idx]->children.begin() + median_idx + 1, parent->children[child_idx]->children.end());
     }
 }
