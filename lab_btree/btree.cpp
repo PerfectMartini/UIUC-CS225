@@ -56,7 +56,6 @@ V BTree<K, V>::find(const BTreeNode* subroot, const K& key) const
     }
     
     return find(subroot->children[first_larger_idx], key);
-
 }
 
 /**
@@ -161,14 +160,13 @@ void BTree<K, V>::insert(BTreeNode* subroot, const DataPair& pair)
      */
 
     /* TODO Your code goes here! */
+    size_t first_larger_idx = insertion_idx(subroot->elements, pair.key);
     if (subroot->is_leaf)
     {
-        size_t first_larger_idx = insertion_idx(subroot->elements, pair.key);
         subroot->elements.insert(subroot->elements.begin() + first_larger_idx, pair);
     }
     else
     {
-        size_t first_larger_idx = insertion_idx(subroot->elements, pair.key);
         insert(subroot->children[first_larger_idx], pair);
         if (subroot->children[first_larger_idx]->elements.size() >= order)
         {
